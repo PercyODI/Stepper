@@ -6,7 +6,9 @@ using System.Threading.Tasks;
 
 namespace Stepper
 {
-    public class Class1
+    public interface IResult
     {
+        bool IsSuccess { get; set; }
+        Exception Exception { get; set; }
     }
 }
