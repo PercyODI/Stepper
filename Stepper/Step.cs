@@ -6,11 +6,11 @@ using System.Threading.Tasks;
 
 namespace Stepper
 {
-    public class Step
+    public class Step<T>
     {
         private StepOptions Options { get; set; }
-        private Func<JobResult, StepResult> StepFunc { get; set; }
-        public Step(Func<JobResult, StepResult> stepFunc, StepOptions options = null)
+        private Func<T, StepResult> StepFunc { get; set; }
+        public Step(Func<T, StepResult> stepFunc, StepOptions options = null)
         {
             if (options == null)
                 options = new StepOptions();
@@ -19,15 +19,12 @@ namespace Stepper
             StepFunc = stepFunc;
         }
 
-        internal StepResult RunStep(JobResult jobResult)
+        internal StepResult RunStep(T obj)
         {
-            if (jobResult == null)
-                 throw new NotImplementedException();
-
             StepResult stepResult;
             try
             {
-                stepResult = StepFunc(jobResult);
+                stepResult = StepFunc(obj);
             }
             catch (Exception ex)
             {

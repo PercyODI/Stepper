@@ -6,36 +6,37 @@ using System.Threading.Tasks;
 
 namespace Stepper
 {
-    public class Stepper
+    public class Stepper<T>
     {
-        private List<Step> _steps;
+        private List<Step<T>> _steps;
 
-        public Stepper() : this(new List<Step>())
+        public Stepper() : this(new List<Step<T>>())
         {
         }
 
-        public Stepper(List<Step> steps)
+        public Stepper(List<Step<T>> steps)
         {
             _steps = steps;
         }
 
-        public void AddStep(Step step)
+        public void AddStep(Step<T> step)
         {
             _steps.Add(step);
         }
 
-        public void RemoveStep(Step step)
+        public void RemoveStep(Step<T> step)
         {
             _steps.Remove(step);
         }
 
-        public JobResult RunJob()
+        public JobResult RunJob(T initObj)
         {
             var jobResult = new JobResult();
             var stepResults = new List<StepResult>();
-            foreach (var step in _steps)
+            T currObj = initObj;
+            foreach(var step in _steps)
             { 
-                var newStepResult = step.RunStep(jobResult);
+                var newStepResult = step.RunStep(currObj);
                 stepResults.Add(newStepResult);
                 if (!newStepResult.IsSuccess)
                 {
