@@ -6,11 +6,12 @@ using System.Threading.Tasks;
 
 namespace Stepper
 {
-    public class Step<T>
+    public class Step<T, U>
     {
         private StepOptions Options { get; set; }
-        private Func<T, StepResult> StepFunc { get; set; }
-        public Step(Func<T, StepResult> stepFunc, StepOptions options = null)
+        private Func<T, StepResult<T>> StepFunc { get; set; }
+        internal Step<T> NextStep { get; set; }
+        public Step(Func<T, StepResult<T>> stepFunc, StepOptions options = null)
         {
             if (options == null)
                 options = new StepOptions();
@@ -19,23 +20,43 @@ namespace Stepper
             StepFunc = stepFunc;
         }
 
-        internal StepResult RunStep(T obj)
+        public Step<U> Then<U>(Step<U> nextStep)
         {
-            StepResult stepResult;
+            NextStep = nextStep;
+            return NextStep;
+        }
+
+        internal void RunStep(JobResult jobResult)
+        {
+            if (jobResult.HasFailed && !Options.AlwaysRun)
+            {
+                NextStep?.RunStep(jobResult);
+                return;
+            }
+
+            StepResult<T> stepResult;
             try
             {
-                stepResult = StepFunc(obj);
+                stepResult = StepFunc();
             }
             catch (Exception ex)
             {
-                stepResult = new StepResult()
+                stepResult = new StepResult<T>()
                 {
                     IsSuccess = false,
                     Exception = ex
                 };
             }
 
-            return stepResult;
+            if (!stepResult.IsSuccess && Options.StopJobOnError)
+            {
+                jobResult.HasFailed = true;
+            }
+        }
+
+        public static implicit operator Step<T>(Step<object> v)
+        {
+            throw new NotImplementedException();
         }
     }
 
