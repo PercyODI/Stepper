@@ -26,24 +26,13 @@ namespace Stepper
             return FirstStep as Step<InT, OutT>;
         }
 
-        //public Step<InT, OutT> AddStep<InT, OutT>(Step<InT, OutT> step)
-        //    where InT : class
-        //    where OutT : class
-        //{
-        //    if(FirstStep == default(Step<InT, OutT>))
-        //    {
-        //        FirstStep = step as IStep<T>;
-        //        return FirstStep as Step<InT, OutT>;
-        //    }
-        //    Step currStep = FirstStep;
-        //    while (currStep.NextStep != null)
-        //    {
-        //        currStep = currStep.NextStep;
-        //    }
-
-        //    return currStep.Then(step);
-
-        //}
+        public Step<InT, OutT> AddFirstStep<InT, OutT>(Func<InT, StepResult<OutT>> StepFunc)
+            where InT : T
+        {
+            var newStep = new Step<InT,OutT>(StepFunc);
+            FirstStep = newStep as IStep<T>;
+            return newStep;
+        }
 
         public JobResult RunJob()
         {

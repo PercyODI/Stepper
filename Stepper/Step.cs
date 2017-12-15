@@ -28,6 +28,13 @@ namespace Stepper
             return NextStep as Step<NewIT, NewOT>;
         }
 
+        public Step<NewIT, NewOT> Then<NewIT, NewOT>(Func<NewIT, StepResult<NewOT>> newStepFunc)
+            where NewIT : OutT
+        {
+            var nextStep = new Step<NewIT, NewOT>(newStepFunc);
+            return NextStep as Step<NewIT, NewOT>;
+        }
+
         public void RunStep(JobResult jobResult, InT passedObj)
         {
             if (jobResult.HasFailed && !Options.AlwaysRun)
