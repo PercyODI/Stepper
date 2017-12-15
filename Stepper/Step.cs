@@ -7,8 +7,6 @@ using System.Threading.Tasks;
 namespace Stepper
 {
     public class Step<InT, OutT> : IStep<InT>
-        where InT : class
-        where OutT : class
     {
         private Type _inputType;
         private StepOptions Options { get; set; }
@@ -24,18 +22,17 @@ namespace Stepper
         }
 
         public Step<NewIT, NewOT> Then<NewIT, NewOT>(Step<NewIT, NewOT> nextStep)
-            where NewIT : class, OutT
-            where NewOT : class
+            where NewIT : OutT
         {
             NextStep = nextStep as IStep<OutT>;
             return NextStep as Step<NewIT, NewOT>;
         }
 
-        public void RunStep(JobResult jobResult, InT passedObj = null)
+        public void RunStep(JobResult jobResult, InT passedObj)
         {
             if (jobResult.HasFailed && !Options.AlwaysRun)
             {
-                NextStep?.RunStep(jobResult);
+                NextStep?.RunStep(jobResult, default(OutT));
                 return;
             }
 

@@ -6,8 +6,8 @@ using System.Threading.Tasks;
 
 namespace Stepper
 {
-    public interface IStep<in T> where T : class
+    public interface IStep<in T>
     {
-        void RunStep(JobResult jobResult, T passedObj = null);
+        void RunStep(JobResult jobResult, T passedObj);
     }
 }

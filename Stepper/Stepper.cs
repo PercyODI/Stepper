@@ -7,17 +7,20 @@ using System.Threading.Tasks;
 namespace Stepper
 {
     public class Stepper<T>
-        where T : class
     {
         private IStep<T> FirstStep;
+        private T FirstInputObject;
 
         public Stepper()
         {
         }
 
+        public void SetFirstInputObject(T obj)
+        {
+            FirstInputObject = obj;
+        }
+
         public Step<InT, OutT> AddFirstStep<InT, OutT>(Step<InT, OutT> step)
-            where InT : class
-            where OutT : class
         {
             FirstStep = step as IStep<T>;
             return FirstStep as Step<InT, OutT>;
@@ -46,7 +49,7 @@ namespace Stepper
         {
             var jobResult = new JobResult();
             //var stepResults = new List<StepResult>();
-            FirstStep.RunStep(jobResult);
+            FirstStep.RunStep(jobResult, FirstInputObject);
 
             return jobResult;
         }
