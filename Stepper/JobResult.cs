@@ -10,5 +10,6 @@ namespace Stepper
     {
         public bool HasFailed = false;
         public Exception Exception { get; set; }
+        public List<StepResult> StepResults = new List<StepResult>();
     }
 }

@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Stepper
 {
-    public class Stepper<T>
+    public class Stepper
     {
         private Step FirstStep;
 
@@ -14,15 +14,21 @@ namespace Stepper
         {
         }
 
-        public void AddStep(Step step)
+        public Step AddStep(Step step)
         {
+            if(FirstStep == default(Step))
+            {
+                FirstStep = step;
+                return FirstStep;
+            }
             Step currStep = FirstStep;
             while (currStep.NextStep != null)
             {
                 currStep = currStep.NextStep;
             }
 
-            currStep.Then(step);
+            return currStep.Then(step);
+
         }
 
         public JobResult RunJob()
