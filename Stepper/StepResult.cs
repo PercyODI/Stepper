@@ -6,11 +6,11 @@ using System.Threading.Tasks;
 
 namespace Stepper
 {
-    public class StepResult : IResult
+    public class StepResult<T> : IResult
     {
         public bool EndJob { get; set; }
         public bool IsSuccess { get; set; }
         public Exception Exception { get; set; }
-        public object PassingObj { get; set; }
+        public T PassingObj { get; set; }
     }
 }

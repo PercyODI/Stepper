@@ -6,35 +6,46 @@ using System.Threading.Tasks;
 
 namespace Stepper
 {
-    public class Stepper
+    public class Stepper<T>
+        where T : class
     {
-        private Step FirstStep;
+        private IStep<T> FirstStep;
 
         public Stepper()
         {
         }
 
-        public Step AddStep(Step step)
+        public Step<InT, OutT> AddFirstStep<InT, OutT>(Step<InT, OutT> step)
+            where InT : class
+            where OutT : class
         {
-            if(FirstStep == default(Step))
-            {
-                FirstStep = step;
-                return FirstStep;
-            }
-            Step currStep = FirstStep;
-            while (currStep.NextStep != null)
-            {
-                currStep = currStep.NextStep;
-            }
-
-            return currStep.Then(step);
-
+            FirstStep = step as IStep<T>;
+            return FirstStep as Step<InT, OutT>;
         }
+
+        //public Step<InT, OutT> AddStep<InT, OutT>(Step<InT, OutT> step)
+        //    where InT : class
+        //    where OutT : class
+        //{
+        //    if(FirstStep == default(Step<InT, OutT>))
+        //    {
+        //        FirstStep = step as IStep<T>;
+        //        return FirstStep as Step<InT, OutT>;
+        //    }
+        //    Step currStep = FirstStep;
+        //    while (currStep.NextStep != null)
+        //    {
+        //        currStep = currStep.NextStep;
+        //    }
+
+        //    return currStep.Then(step);
+
+        //}
 
         public JobResult RunJob()
         {
             var jobResult = new JobResult();
-            var stepResults = new List<StepResult>();
+            //var stepResults = new List<StepResult>();
             FirstStep.RunStep(jobResult);
 
             return jobResult;

@@ -6,12 +6,15 @@ using System.Threading.Tasks;
 
 namespace Stepper
 {
-    public class Step
+    public class Step<InT, OutT> : IStep<InT>
+        where InT : class
+        where OutT : class
     {
+        private Type _inputType;
         private StepOptions Options { get; set; }
-        private Func<object, StepResult> StepFunc { get; set; }
-        internal Step NextStep { get; set; }
-        public Step(Func<object, StepResult> stepFunc, StepOptions options = null)
+        private Func<InT, StepResult<OutT>> StepFunc { get; set; }
+        internal IStep<OutT> NextStep { get; set; }
+        public Step(Func<InT, StepResult<OutT>> stepFunc, StepOptions options = null)
         {
             if (options == null)
                 options = new StepOptions();
@@ -20,13 +23,15 @@ namespace Stepper
             StepFunc = stepFunc;
         }
 
-        public Step Then(Step nextStep)
+        public Step<NewIT, NewOT> Then<NewIT, NewOT>(Step<NewIT, NewOT> nextStep)
+            where NewIT : class, OutT
+            where NewOT : class
         {
-            NextStep = nextStep;
-            return NextStep;
+            NextStep = nextStep as IStep<OutT>;
+            return NextStep as Step<NewIT, NewOT>;
         }
 
-        internal void RunStep(JobResult jobResult)
+        public void RunStep(JobResult jobResult, InT passedObj = null)
         {
             if (jobResult.HasFailed && !Options.AlwaysRun)
             {
@@ -34,14 +39,14 @@ namespace Stepper
                 return;
             }
 
-            StepResult stepResult;
+            StepResult<OutT> stepResult;
             try
             {
-                stepResult = StepFunc(jobResult.StepResults.LastOrDefault()?.PassingObj);
+                stepResult = StepFunc(passedObj);
             }
             catch (Exception ex)
             {
-                stepResult = new StepResult()
+                stepResult = new StepResult<OutT>()
                 {
                     IsSuccess = false,
                     Exception = ex
@@ -52,9 +57,8 @@ namespace Stepper
             {
                 jobResult.HasFailed = true;
             }
-
-            jobResult.StepResults.Add(stepResult);
-            NextStep?.RunStep(jobResult);
+            
+            NextStep?.RunStep(jobResult, stepResult.PassingObj);
         }
     }
 
