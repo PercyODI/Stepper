@@ -28,7 +28,7 @@ namespace Stepper
             return FirstStep as Step<InT, OutT>;
         }
 
-        public Step<InT, OutT> AddFirstStep<InT, OutT>(Func<InT, StepResult<OutT>> StepFunc)
+        public Step<InT, OutT> AddFirstStep<InT, OutT>(Func<InT, IStepResult> StepFunc)
             where InT : T
         {
             var newStep = new Step<InT,OutT>(StepFunc);

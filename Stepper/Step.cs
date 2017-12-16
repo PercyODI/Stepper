@@ -8,11 +8,11 @@ namespace Stepper
 {
     public class Step<InT, OutT> : IStep<InT>
     {
-        private Type _inputType;
         private StepOptions Options { get; set; }
-        private Func<InT, StepResult<OutT>> StepFunc { get; set; }
-        internal IStep<OutT> NextStep { get; set; }
-        public Step(Func<InT, StepResult<OutT>> stepFunc, StepOptions options = null)
+        private Func<InT, IStepResult> StepFunc { get; set; }
+        private IStep<OutT> NextStep { get; set; }
+
+        public Step(Func<InT, IStepResult> stepFunc, StepOptions options = null)
         {
             if (options == null)
                 options = new StepOptions();
@@ -28,7 +28,7 @@ namespace Stepper
             return NextStep as Step<NewIT, NewOT>;
         }
 
-        public Step<NewIT, NewOT> Then<NewIT, NewOT>(Func<NewIT, StepResult<NewOT>> newStepFunc)
+        public Step<NewIT, NewOT> Then<NewIT, NewOT>(Func<NewIT, IStepResult> newStepFunc)
             where NewIT : OutT
         {
             var nextStep = new Step<NewIT, NewOT>(newStepFunc);
@@ -43,7 +43,7 @@ namespace Stepper
                 return;
             }
 
-            StepResult<OutT> stepResult;
+            IStepResult stepResult;
             try
             {
                 stepResult = StepFunc(passedObj);
@@ -62,8 +62,9 @@ namespace Stepper
             {
                 jobResult.HasFailed = true;
             }
-            
-            NextStep?.RunStep(jobResult, stepResult.PassingObj);
+
+            NextStep?.RunStep(jobResult,
+                stepResult.GetType() == typeof(StepResult<OutT>) ? ((StepResult<OutT>) stepResult).PassingObj : default(OutT));
         }
     }
 

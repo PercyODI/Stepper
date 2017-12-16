@@ -124,7 +124,7 @@ namespace Stepper.UnitTests
                 .Then<int, int>(test =>
                 {
                     stepTwoCount++;
-                    return StepResult.Failure<int>();
+                    return StepResult.Failure();
                 })
                 .Then<int, int>(test =>
                 {
@@ -137,6 +137,23 @@ namespace Stepper.UnitTests
             Assert.AreEqual(1, stepOneCount);
             Assert.AreEqual(1, stepTwoCount);
             Assert.AreEqual(0, stepThreeCount);
+        }
+
+        [TestMethod]
+        public void ThreeSteps_FirstStepCreatesString_SecondStepGetsString()
+        {
+            var testString = "This is a test string";
+            var stepper = new Stepper<string>();
+            stepper.AddFirstStep<string, string>(_ =>
+                {
+                    var stringInFirstStep = testString;
+                    return StepResult.Success(stringInFirstStep);
+                })
+                .Then<string, string>(stringUnderTest =>
+                {
+                    Assert.AreEqual(testString, stringUnderTest);
+                    return StepResult.Success(stringUnderTest);
+                });
         }
     }
 
