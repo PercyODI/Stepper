@@ -13,16 +13,17 @@ namespace Stepper.Testing
         {
             var stepper = new Stepper<string>();
             stepper
-                .AddFirstStep(new Step<string, int>(StepOne))
-                .Then(new Step<int, string>(StepTwo));
+                .AddFirstStep<string, int>(StepOne)
+                .Then<int, string>(StepTwo)
+                .Then<string, CustomClass>(StepThree);
             stepper.RunJob();
             Console.ReadLine();
         }
 
-        public static StepResult<int> StepOne(string obj)
+        private static StepResult<int> StepOne(string obj)
         {
             var testObj = 123;
-            Console.WriteLine($"Step One: {obj?.GetHashCode()}");
+            Console.WriteLine($"Step One.");
             return new StepResult<int>()
             {
                 IsSuccess = true,
@@ -30,13 +31,34 @@ namespace Stepper.Testing
             };
         }
 
-        public static StepResult<string> StepTwo(int obj)
+        private static StepResult<string> StepTwo(int obj)
         {
             Console.WriteLine($"Step Two: {obj}");
             return new StepResult<string>()
             {
-                IsSuccess = true
+                IsSuccess = true,
+                PassingObj = $"Recieved {obj} from Step One!"
             };
         }
+
+        private static StepResult<CustomClass> StepThree(string someString)
+        {
+            Console.WriteLine(someString);
+            var test = new CustomClass()
+            {
+                thisString = someString
+            };
+
+            return new StepResult<CustomClass>()
+            {
+                IsSuccess = true,
+                PassingObj = test
+            };
+        }
+    }
+
+    public class CustomClass
+    {
+        public string thisString { get; set; }
     }
 }

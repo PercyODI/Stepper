@@ -32,7 +32,7 @@ namespace Stepper
             where NewIT : OutT
         {
             var nextStep = new Step<NewIT, NewOT>(newStepFunc);
-            return NextStep as Step<NewIT, NewOT>;
+            return Then<NewIT, NewOT>(nextStep);
         }
 
         public void RunStep(JobResult jobResult, InT passedObj)
