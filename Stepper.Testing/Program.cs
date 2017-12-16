@@ -4,6 +4,7 @@ using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using static Stepper.StepResult;
 
 namespace Stepper.Testing
 {
@@ -24,11 +25,7 @@ namespace Stepper.Testing
         {
             var testObj = 123;
             Console.WriteLine($"Step One.");
-            return new StepResult<int>()
-            {
-                IsSuccess = true,
-                PassingObj = testObj
-            };
+            return Success(testObj);
         }
 
         private static StepResult<string> StepTwo(int obj)

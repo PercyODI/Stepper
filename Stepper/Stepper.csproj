@@ -42,6 +42,7 @@
   <ItemGroup>
     <Compile Include="IResult.cs" />
     <Compile Include="IStep.cs" />
+    <Compile Include="IStepResult.cs" />
     <Compile Include="JobResult.cs" />
     <Compile Include="Step.cs" />
     <Compile Include="Stepper.cs" />

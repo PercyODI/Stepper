@@ -10,6 +10,8 @@ namespace Stepper
     {
         private IStep<T> FirstStep;
         private T FirstInputObject;
+        private Action ActionOnSuccess { get; set; }
+        private Action<string, Exception> ActionOnFailure { get; set; }
 
         public Stepper()
         {
@@ -34,13 +36,29 @@ namespace Stepper
             return newStep;
         }
 
-        public JobResult RunJob()
+        public Stepper<T> AddActionOnSuccess(Action onSuccessAction)
+        {
+            ActionOnSuccess = onSuccessAction;
+            return this;
+        }
+
+        public Stepper<T> AddActionOnFailure(Action<string, Exception> onFailureAction)
+        {
+            ActionOnFailure = onFailureAction;
+            return this;
+        }
+
+        public bool RunJob()
         {
             var jobResult = new JobResult();
             //var stepResults = new List<StepResult>();
             FirstStep.RunStep(jobResult, FirstInputObject);
+            if (jobResult.HasFailed)
+                ActionOnFailure?.Invoke(jobResult.FailedMessage, jobResult.Exception);
+            else
+                ActionOnSuccess?.Invoke();
 
-            return jobResult;
+            return !jobResult.HasFailed;
         }
     }
 }

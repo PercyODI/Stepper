@@ -10,6 +10,7 @@ namespace Stepper
     {
         public bool HasFailed = false;
         public Exception Exception { get; set; }
+        public string FailedMessage { get; set; }
         //public List<StepResult<T>> StepResults = new List<StepResult<object>>();
     }
 }

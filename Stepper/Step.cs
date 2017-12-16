@@ -53,11 +53,12 @@ namespace Stepper
                 stepResult = new StepResult<OutT>()
                 {
                     IsSuccess = false,
+                    EndJob = true,
                     Exception = ex
                 };
             }
 
-            if (!stepResult.IsSuccess && Options.StopJobOnError)
+            if (stepResult.EndJob && Options.StopJobOnError)
             {
                 jobResult.HasFailed = true;
             }
