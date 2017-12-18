@@ -6,10 +6,10 @@ using System.Threading.Tasks;
 
 namespace Stepper
 {
-    public class Stepper<T>
+    public class Stepper
     {
-        private IStep<T> FirstStep;
-        private T FirstInputObject;
+        private Step FirstStep;
+        private object FirstInputObject;
         private Action ActionOnSuccess { get; set; }
         private Action<string, Exception> ActionOnFailure { get; set; }
 
@@ -17,48 +17,62 @@ namespace Stepper
         {
         }
 
-        public void SetFirstInputObject(T obj)
+        public void SetFirstInputObject(object obj)
         {
             FirstInputObject = obj;
         }
 
-        public Step<InT, OutT> AddFirstStep<InT, OutT>(Step<InT, OutT> step)
+        public RegularStep AddFirstStep(Func<StepResult> stepFunc)
         {
-            FirstStep = step as IStep<T>;
-            return FirstStep as Step<InT, OutT>;
-        }
-
-        public Step<InT, OutT> AddFirstStep<InT, OutT>(Func<InT, IStepResult> StepFunc)
-            where InT : T
-        {
-            var newStep = new Step<InT,OutT>(StepFunc);
-            FirstStep = newStep as IStep<T>;
+            var newStep = new RegularStep(stepFunc);
+            FirstStep = newStep;
             return newStep;
         }
 
-        public Stepper<T> AddActionOnSuccess(Action onSuccessAction)
+        public InStep<InT> AddFirstStep<InT>(Func<InT, StepResult> stepFunc)
+        {
+            var newStep = new InStep<InT>(stepFunc);
+            FirstStep = newStep;
+            return newStep;
+        }
+
+        public InOutStep<InT, OutT> AddFirstStep<InT, OutT>(Func<InT, StepResult<OutT>> stepFunc)
+        {
+            var newStep = new InOutStep<InT, OutT>(stepFunc);
+            FirstStep = newStep;
+            return newStep;
+        }
+
+        public OutStep<OutT> AddFirstStep<OutT>(Func<StepResult<OutT>> stepFunc)
+        {
+            var newStep = new OutStep<OutT>(stepFunc);
+            FirstStep = newStep;
+            return newStep;
+        }
+
+        public Stepper AddActionOnSuccess(Action onSuccessAction)
         {
             ActionOnSuccess = onSuccessAction;
             return this;
         }
 
-        public Stepper<T> AddActionOnFailure(Action<string, Exception> onFailureAction)
+        public Stepper AddActionOnFailure(Action<string, Exception> onFailureAction)
         {
             ActionOnFailure = onFailureAction;
             return this;
         }
 
-        public bool RunJob()
+        public JobResult RunJob()
         {
             var jobResult = new JobResult();
-            //var stepResults = new List<StepResult>();
-            FirstStep.RunStep(jobResult, FirstInputObject);
+            FirstStep.RunStep(jobResult);
+
             if (jobResult.HasFailed)
                 ActionOnFailure?.Invoke(jobResult.FailedMessage, jobResult.Exception);
             else
                 ActionOnSuccess?.Invoke();
 
-            return !jobResult.HasFailed;
+            return jobResult;
         }
     }
 }

@@ -6,18 +6,17 @@ using System.Threading.Tasks;
 
 namespace Stepper
 {
-    public class StepResult<T> : IResult, IStepResult
+    public class StepResult<T> : IStepResult
     {
         public bool EndJob { get; set; }
         public bool IsSuccess { get; set; }
         public Exception Exception { get; set; }
-        public T PassingObj { get; set; }
+        public T PassingObject { get; set; }
         public bool HasPassingObj
         {
             get { return true; }
-            set { }
+            set {  }
         }
-
     }
 
     public class StepResult : IStepResult
@@ -31,13 +30,22 @@ namespace Stepper
             set { }
         }
 
-        public static StepResult<T> Success<T>(T passingObj = default(T))
+        public static StepResult<T> Success<T>(T passingObj)
         {
             return new StepResult<T>()
             {
                 EndJob = false,
                 IsSuccess = true,
-                PassingObj = passingObj
+                PassingObject = passingObj
+            };
+        }
+
+        public static StepResult Success()
+        {
+            return new StepResult()
+            {
+                EndJob = false,
+                IsSuccess = true
             };
         }
 
@@ -49,5 +57,14 @@ namespace Stepper
                 IsSuccess = false
             };
         }
+
+        public static StepResult<T> Failure<T>()
+        {
+            return new StepResult<T>()
+            {
+                EndJob = true,
+                IsSuccess = false
+            };
+        } 
     }
 }

@@ -40,7 +40,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="IResult.cs" />
+    <Compile Include="Exceptions\MissingStepInputException.cs" />
+    <Compile Include="Exceptions\WrongInputTypeException.cs" />
     <Compile Include="IStep.cs" />
     <Compile Include="IStepResult.cs" />
     <Compile Include="JobResult.cs" />

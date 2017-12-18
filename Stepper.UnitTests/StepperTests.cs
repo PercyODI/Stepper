@@ -10,8 +10,8 @@ namespace Stepper.UnitTests
         public void OneStep_UsingLambdaFunction_RunsFunctionOnce()
         {
             var runCount = 0;
-            var stepper = new Stepper<TestingClass>();
-            stepper.AddFirstStep<TestingClass, int>(test =>
+            var stepper = new Stepper();
+            stepper.AddFirstStep(() =>
             {
                 runCount++;
                 return StepResult.Success(0);
@@ -27,14 +27,14 @@ namespace Stepper.UnitTests
         {
             var stepOneCount = 0;
             var stepTwoCount = 0;
-            var stepper = new Stepper<TestingClass>();
+            var stepper = new Stepper();
             stepper
-                .AddFirstStep<TestingClass, int>(test =>
+                .AddFirstStep(() =>
                 {
                     stepOneCount++;
                     return StepResult.Success(1);
                 })
-                .Then<int, int>(test =>
+                .Then(test =>
                 {
                     stepTwoCount++;
                     return StepResult.Success(1);
@@ -52,19 +52,19 @@ namespace Stepper.UnitTests
             var stepOneCount = 0;
             var stepTwoCount = 0;
             var stepThreeCount = 0;
-            var stepper = new Stepper<TestingClass>();
+            var stepper = new Stepper();
             stepper
-                .AddFirstStep<TestingClass, int>(test =>
+                .AddFirstStep(() =>
                 {
                     stepOneCount++;
-                    return StepResult.Success(1);
+                    return StepResult.Success("ghj");
                 })
-                .Then<int, int>(test =>
+                .Then(test =>
                 {
                     stepTwoCount++;
                     return StepResult.Success(1);
                 })
-                .Then<int, int>(test =>
+                .Then(test =>
                 {
                     stepThreeCount++;
                     return StepResult.Success(1);
@@ -83,19 +83,19 @@ namespace Stepper.UnitTests
             var stepOneCount = 0;
             var stepTwoCount = 0;
             var stepThreeCount = 0;
-            var stepper = new Stepper<TestingClass>();
+            var stepper = new Stepper();
             stepper
-                .AddFirstStep<TestingClass, int>(test =>
+                .AddFirstStep(() =>
                 {
                     stepOneCount++;
                     return StepResult.Success(1);
                 })
-                .Then<int, int>(test =>
+                .Then<int>(test =>
                 {
                     stepTwoCount++;
                     throw new Exception("Fake Exception!");
                 })
-                .Then<int, int>(test =>
+                .Then(test =>
                 {
                     stepThreeCount++;
                     return StepResult.Success(1);
@@ -114,19 +114,19 @@ namespace Stepper.UnitTests
             var stepOneCount = 0;
             var stepTwoCount = 0;
             var stepThreeCount = 0;
-            var stepper = new Stepper<TestingClass>();
+            var stepper = new Stepper();
             stepper
-                .AddFirstStep<TestingClass, int>(test =>
+                .AddFirstStep(() =>
                 {
                     stepOneCount++;
                     return StepResult.Success(1);
                 })
-                .Then<int, int>(test =>
+                .Then(test =>
                 {
                     stepTwoCount++;
-                    return StepResult.Failure();
+                    return StepResult.Failure<int>();
                 })
-                .Then<int, int>(test =>
+                .Then(test =>
                 {
                     stepThreeCount++;
                     return StepResult.Success(1);
@@ -143,17 +143,73 @@ namespace Stepper.UnitTests
         public void ThreeSteps_FirstStepCreatesString_SecondStepGetsString()
         {
             var testString = "This is a test string";
-            var stepper = new Stepper<string>();
-            stepper.AddFirstStep<string, string>(_ =>
+            var stepper = new Stepper();
+            stepper.AddFirstStep(() =>
                 {
                     var stringInFirstStep = testString;
                     return StepResult.Success(stringInFirstStep);
                 })
-                .Then<string, string>(stringUnderTest =>
+                .Then(stringUnderTest =>
                 {
                     Assert.AreEqual(testString, stringUnderTest);
                     return StepResult.Success(stringUnderTest);
                 });
+        }
+
+        [TestMethod]
+        public void OneStep_HasBothSuccessAndFailStepResult_DoesntThrowException()
+        {
+            var stepper = new Stepper();
+            stepper.AddFirstStep(() =>
+                {
+                    if (true)
+                    {
+                        return StepResult.Success(1);
+                    }
+                    return StepResult.Failure<int>();
+                })
+                .Then(test =>
+                {
+
+                    Console.WriteLine(test);
+                    return StepResult.Success();
+                });
+
+            var jobResult = stepper.RunJob();
+            Assert.AreEqual(false, jobResult.HasFailed);
+        }
+
+        [TestMethod]
+        public void ThreeSteps_FromPrivateMethodGroups_ShouldRunAllThreeStepsOnce()
+        {
+            var stepOneCount = 0;
+            var stepTwoCount = 0;
+            var stepThreeCount = 0;
+            var stepper = new Stepper();
+            stepper
+                .AddFirstStep<int, int>(TestStepOne)
+                .Then(test =>
+                {
+                    stepTwoCount++;
+                    return StepResult.Success(1);
+                })
+                .Then(test =>
+                {
+                    stepThreeCount++;
+                    return StepResult.Success(1);
+                });
+
+            stepper.RunJob();
+
+            Assert.AreEqual(1, stepOneCount);
+            Assert.AreEqual(1, stepTwoCount);
+            Assert.AreEqual(1, stepThreeCount);
+        }
+
+        private StepResult<int> TestStepOne(int stepOneCount)
+        {
+            stepOneCount++;
+            return StepResult.Success(0);
         }
     }
 

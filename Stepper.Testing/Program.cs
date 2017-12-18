@@ -12,46 +12,49 @@ namespace Stepper.Testing
     {
         static void Main(string[] args)
         {
-            var stepper = new Stepper<string>();
-            stepper
-                .AddFirstStep<string, int>(StepOne)
-                .Then<int, string>(StepTwo)
-                .Then<string, CustomClass>(StepThree);
-            stepper.RunJob();
-            Console.ReadLine();
+            //var runCount = 0;
+            //var stepper = new Stepper();
+            //stepper.AddFirstStep(new Func<string, StepResult<int>>(test =>
+            //{
+            //    runCount++;
+            //    return StepResult.Success(0);
+            //}));
+
+            //stepper.RunJob();
+            
         }
 
-        private static StepResult<int> StepOne(string obj)
-        {
-            var testObj = 123;
-            Console.WriteLine($"Step One.");
-            return Success(testObj);
-        }
+        //private static StepResult<int> StepOne(string obj)
+        //{
+        //    var testObj = 123;
+        //    Console.WriteLine($"OutStep One.");
+        //    return Success(testObj);
+        //}
 
-        private static StepResult<string> StepTwo(int obj)
-        {
-            Console.WriteLine($"Step Two: {obj}");
-            return new StepResult<string>()
-            {
-                IsSuccess = true,
-                PassingObj = $"Recieved {obj} from Step One!"
-            };
-        }
+        //private static StepResult<string> StepTwo(int obj)
+        //{
+        //    Console.WriteLine($"OutStep Two: {obj}");
+        //    return new StepResult<string>()
+        //    {
+        //        IsSuccess = true,
+        //        PassingObj = $"Recieved {obj} from OutStep One!"
+        //    };
+        //}
 
-        private static StepResult<CustomClass> StepThree(string someString)
-        {
-            Console.WriteLine(someString);
-            var test = new CustomClass()
-            {
-                thisString = someString
-            };
+        //private static StepResult<CustomClass> StepThree(string someString)
+        //{
+        //    Console.WriteLine(someString);
+        //    var test = new CustomClass()
+        //    {
+        //        thisString = someString
+        //    };
 
-            return new StepResult<CustomClass>()
-            {
-                IsSuccess = true,
-                PassingObj = test
-            };
-        }
+        //    return new StepResult<CustomClass>()
+        //    {
+        //        IsSuccess = true,
+        //        PassingObj = test
+        //    };
+        //}
     }
 
     public class CustomClass
