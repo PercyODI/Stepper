@@ -13,15 +13,6 @@ namespace Stepper
         private Action ActionOnSuccess { get; set; }
         private Action<string, Exception> ActionOnFailure { get; set; }
 
-        public Stepper()
-        {
-        }
-
-        public void SetFirstInputObject(object obj)
-        {
-            FirstInputObject = obj;
-        }
-
         public RegularStep AddFirstStep(Func<StepResult> stepFunc)
         {
             var newStep = new RegularStep(stepFunc);
@@ -65,6 +56,29 @@ namespace Stepper
         public JobResult RunJob()
         {
             var jobResult = new JobResult();
+            FirstStep.RunStep(jobResult);
+
+            if (jobResult.HasFailed)
+                ActionOnFailure?.Invoke(jobResult.FailedMessage, jobResult.Exception);
+            else
+                ActionOnSuccess?.Invoke();
+
+            return jobResult;
+        }
+
+        public JobResult RunJob(object firstInputObject)
+        {
+            var jobResult = new JobResult();
+
+            var firstStepType = FirstStep.GetType();
+            if (firstStepType == typeof(InStep<>) || firstStepType == typeof(InOutStep<,>))
+            {
+                jobResult.StepResults.Add(new StepResult<object>()
+                {
+                    EndJob = false,
+                    PassingObject = firstInputObject
+                });
+            }
             FirstStep.RunStep(jobResult);
 
             if (jobResult.HasFailed)

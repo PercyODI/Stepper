@@ -182,33 +182,33 @@ namespace Stepper.UnitTests
         [TestMethod]
         public void ThreeSteps_FromPrivateMethodGroups_ShouldRunAllThreeStepsOnce()
         {
-            var stepOneCount = 0;
-            var stepTwoCount = 0;
-            var stepThreeCount = 0;
+            var stepCount = 0;
             var stepper = new Stepper();
             stepper
                 .AddFirstStep<int, int>(TestStepOne)
-                .Then(test =>
-                {
-                    stepTwoCount++;
-                    return StepResult.Success(1);
-                })
-                .Then(test =>
-                {
-                    stepThreeCount++;
-                    return StepResult.Success(1);
-                });
+                .Then<int>(TestStepTwo)
+                .Then<int>(TestStepThree);
 
-            stepper.RunJob();
-
-            Assert.AreEqual(1, stepOneCount);
-            Assert.AreEqual(1, stepTwoCount);
-            Assert.AreEqual(1, stepThreeCount);
+            var result = stepper.RunJob(stepCount);
+            Assert.AreEqual(3, stepCount);
+            
         }
 
         private StepResult<int> TestStepOne(int stepOneCount)
         {
             stepOneCount++;
+            return StepResult.Success(0);
+        }
+
+        private StepResult<int> TestStepTwo(int stepTwoCount)
+        {
+            stepTwoCount++;
+            return StepResult.Success(0);
+        }
+
+        private StepResult<int> TestStepThree(int stepThreeCount)
+        {
+            stepThreeCount++;
             return StepResult.Success(0);
         }
     }
