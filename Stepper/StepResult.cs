@@ -30,6 +30,15 @@ namespace Stepper
             set { }
         }
 
+        public static StepResult Success()
+        {
+            return new StepResult()
+            {
+                EndJob = false,
+                IsSuccess = true
+            };
+        }
+
         public static StepResult<T> Success<T>(T passingObj)
         {
             return new StepResult<T>()
@@ -37,15 +46,6 @@ namespace Stepper
                 EndJob = false,
                 IsSuccess = true,
                 PassingObject = passingObj
-            };
-        }
-
-        public static StepResult Success()
-        {
-            return new StepResult()
-            {
-                EndJob = false,
-                IsSuccess = true
             };
         }
 
