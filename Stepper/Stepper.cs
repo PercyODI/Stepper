@@ -20,23 +20,23 @@ namespace Stepper
             return newStep;
         }
 
-        public InStep<InT> AddFirstStep<InT>(Func<InT, StepResult> stepFunc)
+        public InStep<TIn> AddFirstStep<TIn>(Func<TIn, StepResult> stepFunc)
         {
-            var newStep = new InStep<InT>(stepFunc);
+            var newStep = new InStep<TIn>(stepFunc);
             FirstStep = newStep;
             return newStep;
         }
 
-        public InOutStep<InT, OutT> AddFirstStep<InT, OutT>(Func<InT, StepResult<OutT>> stepFunc)
+        public InOutStep<TIn, TOut> AddFirstStep<TIn, TOut>(Func<TIn, StepResult<TOut>> stepFunc)
         {
-            var newStep = new InOutStep<InT, OutT>(stepFunc);
+            var newStep = new InOutStep<TIn, TOut>(stepFunc);
             FirstStep = newStep;
             return newStep;
         }
 
-        public OutStep<OutT> AddFirstStep<OutT>(Func<StepResult<OutT>> stepFunc)
+        public OutStep<TOut> AddFirstStep<TOut>(Func<StepResult<TOut>> stepFunc)
         {
-            var newStep = new OutStep<OutT>(stepFunc);
+            var newStep = new OutStep<TOut>(stepFunc);
             FirstStep = newStep;
             return newStep;
         }
