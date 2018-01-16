@@ -6,6 +6,8 @@ namespace Stepper.UnitTests
     [TestClass]
     public class StepperTests
     {
+        private int _stepCount { get; set; }
+
         [TestMethod]
         public void OneStep_UsingLambdaFunction_RunsFunctionOnce()
         {
@@ -124,7 +126,11 @@ namespace Stepper.UnitTests
                 .Then(test =>
                 {
                     stepTwoCount++;
-                    return StepResult.Failure<int>();
+                    if (false)
+                    {
+                        return StepResult.Success(2);
+                    }
+                    return StepResult.Failure();
                 })
                 .Then(test =>
                 {
@@ -166,7 +172,7 @@ namespace Stepper.UnitTests
                     {
                         return StepResult.Success(1);
                     }
-                    return StepResult.Failure<int>();
+                    return StepResult.Failure();
                 })
                 .Then(test =>
                 {
@@ -182,34 +188,34 @@ namespace Stepper.UnitTests
         [TestMethod]
         public void ThreeSteps_FromPrivateMethodGroups_ShouldRunAllThreeStepsOnce()
         {
-            var stepCount = 0;
+            _stepCount = 0;
             var stepper = new Stepper();
             stepper
-                .AddFirstStep<int, int>(TestStepOne)
-                .Then<int>(TestStepTwo)
-                .Then<int>(TestStepThree);
+                .AddFirstStep(TestStepOne)
+                .Then(TestStepTwo)
+                .Then(TestStepThree);
 
-            var result = stepper.RunJob(stepCount);
-            Assert.AreEqual(3, stepCount);
+            var result = stepper.RunJob(0);
+            Assert.AreEqual(3, _stepCount);
             
         }
 
-        private StepResult<int> TestStepOne(int stepOneCount)
+        private StepResult TestStepOne()
         {
-            stepOneCount++;
-            return StepResult.Success(0);
+            _stepCount++;
+            return StepResult.Success();
         }
 
-        private StepResult<int> TestStepTwo(int stepTwoCount)
+        private StepResult TestStepTwo()
         {
-            stepTwoCount++;
-            return StepResult.Success(0);
+            _stepCount++;
+            return StepResult.Success();
         }
 
-        private StepResult<int> TestStepThree(int stepThreeCount)
+        private StepResult TestStepThree()
         {
-            stepThreeCount++;
-            return StepResult.Success(0);
+            _stepCount++;
+            return StepResult.Success();
         }
     }
 

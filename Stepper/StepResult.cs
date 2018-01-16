@@ -12,6 +12,16 @@ namespace Stepper
         public bool IsSuccess { get; set; }
         public Exception Exception { get; set; }
         public T PassingObject { get; set; }
+
+        public static implicit operator StepResult<T>(StepResult sr)
+        {
+            return new StepResult<T>()
+            {
+                EndJob = true,
+                IsSuccess = false
+            };
+        }
+
         public bool HasPassingObj
         {
             get { return true; }
